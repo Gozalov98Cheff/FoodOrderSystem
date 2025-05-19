@@ -1,12 +1,15 @@
 package orccommpany.foodordersystem.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import orccommpany.foodordersystem.enums.OrderStatus;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,20 +18,21 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+     Long id;
 
     @ManyToOne
-    private User user;
+    User user;
 
-    private LocalDateTime orderDate;
+    LocalDateTime orderDate;
 
-    private String status;
+    String status;
 
-    private Double totalAmount;
+    BigDecimal totalAmount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItem> items;
+     List<OrderItem> items;
 }

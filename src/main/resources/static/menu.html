@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Our Menu</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('/img/food3.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 70px;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255,255,255,0.9);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #222;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #4070f4;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            background-color: #4070f4;
+            color: white;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #1e56e6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Food Menu</h2>
+    <button onclick="loadMenu()">Load Menu</button>
+    <table id="menuTable" style="display: none;">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Price (AZN)</th>
+        </tr>
+        </thead>
+        <tbody id="menuBody">
+        <!-- Menu items will appear here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function loadMenu() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please login first.");
+            window.location.href = "/login";
+            return;
+        }
+
+        fetch("/api/menu", {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Unauthorized or server error");
+                }
+                return res.json();
+            })
+            .then(data => {
+                const table = document.getElementById("menuTable");
+                const body = document.getElementById("menuBody");
+                table.style.display = "table";
+                body.innerHTML = "";
+
+                data.forEach(item => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.description}</td>
+                    <td>${item.category}</td>
+                    <td>${item.price}</td>
+                `;
+                    body.appendChild(row);
+                });
+            })
+            .catch(err => {
+                alert("Error loading menu: " + err.message);
+            });
+    }
+</script>
+
+</body>
+</html>
+

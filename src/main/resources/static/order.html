@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Place Order</title>
+    <style>
+        body {
+            background-image: url('/img/food3.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+        }
+
+        .order-container {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 30px;
+            border-radius: 12px;
+            width: 360px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        label {
+            margin-top: 15px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: none;
+        }
+
+        button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div class="order-container">
+    <h2>Place Your Order</h2>
+    <label for="menuItemId">Menu Item ID</label>
+    <input type="number" id="menuItemId" placeholder="e.g. 1" required>
+
+    <label for="quantity">Quantity</label>
+    <input type="number" id="quantity" placeholder="e.g. 2" required>
+
+    <button onclick="submitOrder()">Submit Order</button>
+</div>
+
+<script>
+    function submitOrder() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please login first.");
+            window.location.href = "/login";
+            return;
+        }
+
+        const menuItemId = document.getElementById("menuItemId").value;
+        const quantity = document.getElementById("quantity").value;
+
+        if (!menuItemId || !quantity) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        const orderData = {
+            userId: 1, // İstəyirsənsə, dinamik et gələcəkdə
+            items: [
+                {
+                    menuItemId: parseInt(menuItemId),
+                    quantity: parseInt(quantity)
+                }
+            ]
+        };
+
+        fetch("/api/orders", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify(orderData)
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("Order placed successfully!");
+                    window.location.href = "/menu.html";
+                } else {
+                    alert("Order failed. Status: " + res.status);
+                }
+            })
+            .catch(err => {
+                alert("Error: " + err.message);
+            });
+    }
+</script>
+
+</body>
+</html>

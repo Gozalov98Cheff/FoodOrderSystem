@@ -16,6 +16,7 @@ import orccommpany.foodordersystem.repository.UserRepository;
 import orccommpany.foodordersystem.service.OrderService;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,12 +49,14 @@ public class OrderServiceImpl implements OrderService {
             OrderItem orderItem = new OrderItem();
             orderItem.setMenuItem(menuItem);
             orderItem.setQuantity(itemDto.getQuantity());
-            orderItem.setPrice(menuItem.getPrice() * itemDto.getQuantity());
+            orderItem.setPrice(menuItem.getPrice().multiply(BigDecimal.valueOf(itemDto.getQuantity())));
             orderItem.setOrder(order);
             return orderItem;
         }).collect(Collectors.toList());
 
-        double total = items.stream().mapToDouble(OrderItem::getPrice).sum();
+        BigDecimal total = items.stream()
+                .map(OrderItem::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         order.setTotalAmount(total);
         order.setItems(items);
 

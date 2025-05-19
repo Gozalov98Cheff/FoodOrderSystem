@@ -5,14 +5,17 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import orccommpany.foodordersystem.dto.UserDto;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -23,22 +26,18 @@ public class JwtUtil {
     private final Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
     public String generateToken(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
-
-        String username;
-        if (principal instanceof org.springframework.security.core.userdetails.User) {
-            username = ((org.springframework.security.core.userdetails.User) principal).getUsername();
-        } else {
-            throw new RuntimeException("Unknown principal type");
-        }
-
+        UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userPrincipal.getUsername())
+                .claim("roles", userPrincipal.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
 
     public String getUsernameFromJwt(String token) {

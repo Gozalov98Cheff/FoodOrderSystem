@@ -1,11 +1,14 @@
 package orccommpany.foodordersystem.model;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import orccommpany.foodordersystem.dto.OrderItemDto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -13,19 +16,20 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MenuItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    Long id;
 
-    private String name;
+    String name;
 
-    private String description;
+    String description;
 
-    private double price;
+    BigDecimal price;
 
-    private String category;
+    String category;
 
     @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
